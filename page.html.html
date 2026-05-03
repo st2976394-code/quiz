@@ -516,5 +516,118 @@ a[href*="linkQst16"] {
 
 
 
+<script>
+/* CPIA - Fasce su punteggio originale QuizFaber /80 */
+function calcolaFasciaQuizFaber(score) {
+  score = parseFloat(score) || 0;
+
+  if (score <= 31) return "Non superato";
+  if (score <= 43) return "Iniziale";
+  if (score <= 55) return "Base";
+  if (score <= 67) return "Intermedio";
+  return "Avanzato";
+}
+
+(function () {
+  function fixQuestion3Matching() {
+    var root = document.getElementById("matching2");
+    if (!root) return;
+
+    root.style.width = "100%";
+    root.style.maxWidth = "100%";
+    root.style.marginLeft = "0";
+    root.style.marginRight = "0";
+    root.style.paddingLeft = "0";
+    root.style.paddingRight = "0";
+    root.style.overflowX = "hidden";
+    root.style.boxSizing = "border-box";
+
+    var nodes = root.querySelectorAll("*");
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      el.style.maxWidth = "100%";
+      el.style.boxSizing = "border-box";
+
+      if (el.tagName === "TABLE" || el.tagName === "TBODY" || el.tagName === "TR" || el.tagName === "TD" || el.tagName === "TH") {
+        el.style.display = "block";
+        el.style.width = "100%";
+        el.style.marginLeft = "0";
+        el.style.paddingLeft = "0";
+      }
+
+      if (el.className && typeof el.className === "string" && el.className.indexOf("col-") !== -1) {
+        el.style.float = "none";
+        el.style.width = "100%";
+        el.style.paddingLeft = "0";
+        el.style.paddingRight = "0";
+      }
+
+      if (el.tagName === "SELECT" || el.tagName === "INPUT") {
+        el.style.width = "100%";
+        el.style.maxWidth = "100%";
+        el.style.minWidth = "0";
+      }
+    }
+  }
+
+  function getQuizFaberScore() {
+    if (typeof quiz !== "undefined" && quiz && typeof quiz.mark !== "undefined") {
+      var qmark = parseFloat(quiz.mark);
+      if (!isNaN(qmark)) return qmark;
+    }
+
+    var text = document.body ? document.body.innerText : "";
+    var m = text.match(/(\d+(?:[\.,]\d+)?)\s*\/\s*80/);
+    if (m) return parseFloat(m[1].replace(",", "."));
+
+    return null;
+  }
+
+  function mostraFasciaQuizFaber() {
+    var score = getQuizFaberScore();
+    if (score === null || isNaN(score)) return;
+
+    var fascia = calcolaFasciaQuizFaber(score);
+    var box = document.getElementById("fasciaFinaleCPIA");
+
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "fasciaFinaleCPIA";
+      box.className = "alert alert-info";
+      box.style.marginTop = "15px";
+      box.style.fontSize = "18px";
+
+      var target =
+        document.getElementById("idQuizResultsPanelTop") ||
+        document.getElementById("allPanelsId") ||
+        document.querySelector(".container") ||
+        document.body;
+
+      target.appendChild(box);
+    }
+
+    box.innerHTML =
+      "<strong>Giudizio:</strong> " + fascia +
+      "<br><small>Calcolato sul punteggio QuizFaber: " + score + "/80</small>";
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fixQuestion3Matching();
+    setInterval(fixQuestion3Matching, 300);
+    setInterval(mostraFasciaQuizFaber, 800);
+  });
+
+  window.addEventListener("load", function () {
+    fixQuestion3Matching();
+    setTimeout(fixQuestion3Matching, 1000);
+    setTimeout(mostraFasciaQuizFaber, 1000);
+    setTimeout(mostraFasciaQuizFaber, 2500);
+  });
+
+  window.addEventListener("resize", fixQuestion3Matching);
+})();
+</script>
+
 </body>
 </html>
+
